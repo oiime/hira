@@ -1,0 +1,42 @@
+<div id="wrapper">
+  <nav style="margin-bottom: 0" role="navigation" class="navbar navbar-default navbar-static-top">
+            <div class="navbar-header">
+                <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="index.html" class="navbar-brand">Humanitarian Information review and Analysis (HIRA)</a>
+            </div>
+            <!-- /.navbar-header -->
+            <ul class="nav navbar-top-links navbar-right">
+                <li ng-show="myself.role == 2"><a ui-sref="system.users">Users</a></li>
+                <li><a ui-sref="system.sources">Sources</a></li>
+                <li><a ui-sref="system.entries">Entries</a></li>
+                <li><a ui-sref="system.definitions">Definitions</a></li>
+                <li><a ui-sref="system.slocations">Locations</a></li>
+                <li><a ui-sref="system.export">Export</a></li>
+                <li><a ui-sref="system.help">Help/About</a></li>
+
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a ui-sref="system.profile"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a ui-sref="logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+            <!-- /.navbar-static-side -->
+        </nav>
+        <section data-ng-view ui-view="" id="content"></section>
+</div>

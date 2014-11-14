@@ -1,0 +1,30 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="login-panel panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Please Sign In</h3>
+                </div>
+                <div class="panel-body">
+                    <form role="form" name="formLogin" ng-submit="actions.submit(formLogin, credentials)" validate>
+                        <div ng-show="formLogin.serverErrors" class="alert alert-warning">
+                        <li ng-repeat="error in formLogin.serverErrors"><b>{{error.name}}</b>: {{error.error}}</li>
+                        </div>
+                        <fieldset>
+                            <div class="form-group" show-errors>
+                                <input class="form-control" placeholder="E-mail" name="email" ng-model="credentials.email" ng-required type="email" autofocus>
+                            </div>
+                            <div class="form-group" show-errors>
+                                <input class="form-control" placeholder="Password" name="password" type="password" ng-required ng-model="credentials.password" value="">
+                            </div>
+                            <button type="submit" class="btn btn-lg btn-success btn-block">Login</button>
+                        </fieldset>
+
+                    </form>
+                    <a ui-sref="register">Dont have a user? Click here to register</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,146 @@
+
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="well panel-body">
+                <form role="form">
+                    <div class="row">
+                        <div class="col-lg-2">
+                            <label for="date">Date:</label>
+                            <div class="dropdown">
+                              <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="#">
+                                <div class="input-group"><input type="text" class="form-control" ng-value="filters.date | date:'yyyy-MM-dd'"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                              </a>
+                              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker data-ng-model="filters.date" data-datetimepicker-config="{ startView:'day', minView:'day' }"></datetimepicker>
+                              </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                          <div class="form-group">
+                            <label for="country">Country:</label>
+                            <ui-select ng-model="filters.country" style="min-width:10em;">
+                              <ui-select-match placeholder="Select Country">{{$select.selected.name}}</ui-select-match>
+                              <ui-select-choices repeat="country.code as country in countries | filter: $select.search">
+                                <div ng-bind-html="country.name | highlight: $select.search"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                          </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <label for="country">Status:</label>
+                            <ui-select ng-model="filters.status" style="min-width:10em;">
+                              <ui-select-match placeholder="Select Status">{{$select.selected.name}}</ui-select-match>
+                              <ui-select-choices repeat="status.id as status in statuses | filter: $select.search">
+                                <div ng-bind-html="status.name | highlight: $select.search"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                        </div>
+                        <div class="col-lg-2">
+                            <br/>
+                            <button type="submit" class="btn btn-primary" ng-click="actions.filter(filters)">Filter</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-success pull-right" ng-click="actions.add()">Add Source</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" ng-table="tableParams">
+                        <thead>
+                            <tr>
+                                <th style="min-width:10em; text-align: left;">Date</th>
+                                <th style="min-width:10em; text-align: left;">Source Name</th>
+                                <th style="min-width:10em; text-align: left;">Site</th>
+                                <th style="min-width:10em; text-align: left;">URL</th>
+                                <th style="min-width:10em; text-align: left;">Documents</th>
+                                <th style="min-width:10em; text-align: left;">Countries</th>
+                                <th style="min-width:10em; text-align: left;">Entries</th>
+                                <th style="min-width:120px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="odd gradeX" ng-repeat="source in $data" >
+                                <td>
+                                    <span ng-if="source._edit">
+                                        <div class="dropdown">
+                                          <a class="dropdown-toggle" id="dropdown{{source.id}}" role="button" data-toggle="dropdown" data-target="#" href="#">
+                                            <div class="input-group"><input type="text" class="form-control" ng-value="source.date | date:'yyyy-MM-dd'"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                            </div>
+                                          </a>
+                                          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                            <datetimepicker data-ng-model="source.date" data-datetimepicker-config="{ startView:'day', minView:'day' }"></datetimepicker>
+                                          </ul>
+                                        </div>
+                                    </span>
+                                    <span ng-if="!source._edit">
+                                        <span am-time-ago="source.date"></span> <i ng-if="source.user"><br/><a href="">{{source.user.name}}</a></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span ng-if="source._edit">
+                                        <div class="form-group">
+                                          <ui-select ng-model="source.type">
+                                            <ui-select-match placeholder="Select Type">{{$select.selected.name}}</ui-select-match>
+                                            <ui-select-choices repeat="type.id as type in definitions.sourcetype.values | filter: $select.search">
+                                              <div ng-bind-html="type.name | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                          </ui-select>
+                                        </div>
+                                    </span>
+                                    <span ng-if="!source._edit">{{definitionStrings[source.type]}}</span>
+                                </td>
+                                <td><a ng-href="http://{{source.site}}" target="_blank">{{source.site}}</a></td>
+                                <td style="word-wrap:break-word;  max-width:200px; ">
+                                    <a ng-if="!source._edit" ng-href="{{source.link}}" target="_blank">{{source.link }}</a>
+
+                                    <input ng-if="source._edit" type="url" placeholder="Link" class="form-control" ng-model="source.link">
+                                </td>
+                                <td>
+                                    <button ng-if="source._edit && source.id > 0" class="btn btn-success" ng-file-select="actions.onFileSelect($files, source)">Upload Document</button>
+                                    <p ng-if="source.id > 0" ng-repeat="document in source.documents">
+                                      <button ng-if="source._edit" class="btn btn-danger btn-xs btn-outline" type="button" ng-click="actions.deleteDocument(source, document, $index)" tooltip="Delete Document"><i class="fa fa-minus"></i>
+                                      </button>
+                                      <a  ng-href="/documents/{{document.refname}}" target="_self" download="{{document.filename}}"><i class="fa fa-file"></i> {{document.filename}}</a>
+                                    </p>
+                                </td>
+                                <td>{{source.countries}}</td>
+                                <td>
+                                    <span ng-if="!source._edit">
+
+                                      <a ui-sref="system.entry_new({ source_id: source.id})" class="" type="button">
+<span class="label" ng-class="{ 'label-info': source.entries_count >0, 'label-warning': source.entries_count == 0}" > {{source.entries_count}}</span>
+                                      Add Entry</a>
+                                    </span>
+                                </td>
+                                <td>
+                                  <button ng-if="!source._edit" class="btn btn-primary btn-circle" type="button" ng-click="actions.edit(source)" tooltip="Edit"><i class="fa fa-pencil"></i>
+                                  </button>
+                                  <button ng-if="source._edit" class="btn btn-primary btn-circle" type="button" ng-click="actions.save(source)" tooltip="Save"><i class="fa fa-save"></i>
+                                  </button>
+                                  <button ng-if="!source._edit" class="btn btn-danger btn-circle" type="button" ng-click="actions.delete(source, $index)" tooltip="Delete"><i class="fa fa-minus"></i>
+                                  </button>
+
+                                  <button ng-if="source.status == 2" class="btn btn-success btn-circle" type="button" ng-click="actions.activate(source)" tooltip="Activate (Not Done)"><i class="fa fa-heart"></i>
+                                  </button>
+                                  <button ng-if="source.status == 1" class="btn btn-warning btn-circle" type="button" ng-click="actions.inactivate(source)" tooltip="Inactivate (Done)"><i class="fa fa-power-off"></i>
+                                  </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->

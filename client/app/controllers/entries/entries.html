@@ -1,0 +1,149 @@
+
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="well panel-body">
+                <form role="form">
+                    <div class="row">
+                        <div class="col-lg-2">
+                          <div class="form-group">
+                            <label for="country">Country:</label>
+                            <ui-select ng-model="filters.country" style="min-width:10em;">
+                              <ui-select-match placeholder="Select Country">{{$select.selected.name}}</ui-select-match>
+                              <ui-select-choices repeat="country.code as country in countries | filter: $select.search">
+                                <div ng-bind-html="country.name | highlight: $select.search"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                          </div>
+                        </div>
+                        <div class="col-lg-2">
+                          <div class="form-group">
+                            <label for="tag">Sectors:</label>
+                            <ui-select multiple ng-model="filters.tags" class="form-control">
+                              <ui-select-match placeholder="Select Sector...">{{$item.subsector}} &lt;{{$item.sector}}&gt;</ui-select-match>
+                              <ui-select-choices repeat="value.id as value in definitions.interest.values | filter: $select.search">
+                                <div ng-bind-html="value.subsector | highlight: $select.search"></div>
+                                <small>
+                                  <span ng-bind-html="value.sector | highlight: $select.search"></span>
+                                </small>
+                              </ui-select-choices>
+                            </ui-select>
+                          </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <label for="country">Status:</label>
+                            <ui-select ng-model="filters.status" style="min-width:10em;">
+                              <ui-select-match placeholder="Select Status">{{$select.selected.name}}</ui-select-match>
+                              <ui-select-choices repeat="status.id as status in statuses | filter: $select.search">
+                                <div ng-bind-html="status.name | highlight: $select.search"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                        </div>
+                        <div class="col-lg-2">
+                            <label for="date">Date:</label>
+                            <div class="dropdown">
+                              <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="#">
+                                <div class="input-group"><input type="text" class="form-control" ng-value="filters.date | date:'yyyy-MM-dd'"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                              </a>
+                              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker data-ng-model="filters.date" data-datetimepicker-config="{ startView:'day', minView:'day' }"></datetimepicker>
+                              </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <br/>
+                            <button type="submit" class="btn btn-primary" ng-click="actions.filter(filters)">Filter</button>
+                        </div>
+                        <div class="col-lg-4">
+                            <!--
+                            <ui-gmap-google-map center="geo.center" zoom="1" style="width:400px;">
+                              <ui-gmap-marker ng-repeat="entry in table.dataset" coords="entry.location" idKey="999">
+                              </ui-gmap-marker>
+                            </ui-gmap-google-map>
+                            -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" ng-table="tableParams">
+                        <thead>
+                            <tr>
+                                <th style="min-width:4em;">S</th>
+                                <th style="min-width:4em;">R</th>
+                                <th style="min-width:10em; text-align: left;"><a href="#" ng-click="actions.sort('createdAt');">Report Date</a></th>
+                                <th style="min-width:10em; text-align: left;" class="text-left">Location</th>
+                                <th style="min-width:10em; text-align: left;">Sector(s)</th>
+                                <th style="min-width:10em; text-align: left;">Type</th>
+                                <th style="min-width:10em; text-align: left;">Response Category</th>
+                                <th style="min-width:10em; text-align: left;">Affected</th>
+                                <th style="min-width:10em; text-align: left;">Vulnerable</th>
+                                <th style="min-width:10em; text-align: left;">Source</th>
+                                <th style="min-width:120px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="odd gradeX" ng-repeat="entry in $data" ng-class="{danger: entry.severity >= 5}">
+                                <td class="center text-center" ng-class="{info: entry.severity <= 2, warning: entry.severity > 2 && entry.severity < 4, danger: entry.severity >= 4}">
+                                  {{entry.severity}}
+                                </td>
+                                <td class="center text-center grey">
+                                  {{entry.reliability}}
+                                </td>
+                                <td><span am-time-ago="entry.createdAt"></span> {{entry.createdAt | amDateFormat: 'YYYY-MM-DD'}} <i ng-if="entry.user"><br/><a href="">{{entry.user.name}}</a></i></td>
+                                <td>
+                                  <p ng-repeat="slocation in entry.slocations">
+                                    <b>{{slocation.country}}</b> <span ng-if="slocation.id">{{slocation.name}} ({{slocation.code}})</span>
+                                  </p>
+                                <td>
+                                    <span ng-repeat="interest in entry.interest">{{definitionStrings[interest]}}<br/></span>
+                                </td>
+                                <td>
+                                    <span ng-repeat="informationtype in entry.informationtype">{{definitionStrings[informationtype]}}<br/></span>
+                                </td>
+                                <td>
+                                    <span ng-repeat="responsecategory in entry.responsecategory">{{definitionStrings[responsecategory]}}<br/></span>
+                                </td>
+                                <td>
+                                    <span ng-repeat="affected in entry.affected">{{definitionStrings[affected]}}<br/></span>
+                                </td>
+                                <td>
+                                    <span ng-repeat="vulnerablegroup in entry.vulnerablegroup">{{definitionStrings[vulnerablegroup]}}<br/></span>
+                                </td>
+                                <td>
+                                    <blockquote>
+                                      <p ng-if="entry.excerpt.length > 0" style="font-size:0.8em;" data-ellipsis data-ng-bind="entry.excerpt" data-ellipsis-append="..."></p>
+                                      <footer>
+                                        <cite title="{{entry.source.date}}">{{definitionStrings[entry.source.type]}} <span am-time-ago="entry.source.date"></span></cite>
+                                        <a ng-href="{{entry.source.link}}" target="_blank">{{entry.source.link}}</a>
+                                      </footer>
+                                    </blockquote>
+
+                                </td>
+                                <td>
+                                  <button ng-if="entry.status == 2" class="btn btn-success btn-circle" type="button" ng-click="actions.activate(entry)" tooltip="Activate (Not Done)"><i class="fa fa-heart"></i>
+                                  </button>
+                                  <button ng-if="entry.status == 1" class="btn btn-warning btn-circle" type="button" ng-click="actions.inactivate(entry)" tooltip="Inactivate (Done)"><i class="fa fa-power-off"></i>
+                                  </button>
+
+                                  <a class="btn btn-primary btn-circle" type="button" ui-sref="system.entry_edit({ id: entry.id})" tooltip="Edit"><i class="fa fa-pencil"></i>
+                                  </a>
+                                  <button class="btn btn-danger btn-circle" type="button" ng-click="actions.delete(entry)" tooltip="Delete"><i class="fa fa-minus"></i>
+                                  </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->

@@ -1,0 +1,162 @@
+<script type="text/ng-template" id="locationTemplate.html">
+  <a>
+      <b>[{{match.model.level}}] {{match.model.code}}</b>
+      <span bind-html-unsafe="match.model.name | typeaheadHighlight:query"></span>
+  </a>
+</script>
+<script type="text/ng-template" id="form-messages">
+  <div ng-message="required">This field cannot be blank</div>
+  <div ng-message="minlength">The value for this field is too short</div>
+  <div ng-message="maxlength">The value for this field is too long</div>
+  <div ng-message="email">You have entered an incorrect email value</div>
+  <div ng-message="pattern">You did not enter the value in the correct format</div>
+  <div ng-message="password-characters">
+    Your password must consist of alphabetical or numeric characters.
+    It must also contain at least one special character, a number as well as an uppercase letter.
+  </div>
+</script>
+
+
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Entry for source <b>[{{entry.source_id}}]</b> <a ng-href="entry.source.link" target="_blank">{{entry.source.link}}</a>
+            </div>
+            <div class="panel-body">
+<!-- form -->
+<form role="form" name="formEntry" ng-submit="actions.submit(formEntry, entry)" validate>
+  <div ng-show="formEntry.serverErrors" class="alert alert-warning">
+    <li ng-repeat="error in formEntry.serverErrors"><b>{{error.name}}</b>: {{error.error}}</li>
+  </div>
+  <div class="row">
+        <div class="col-lg-6">
+                  <div ng-repeat="slocation in entry.slocations">
+                    <label>Location {{$index+1}}</label>
+                    <div class="form-group">
+                      <div class="row">
+                          <div class="col-lg-4">
+                            <ui-select ng-model="slocation.country" ng-required>
+                              <ui-select-match placeholder="Select Country">{{$select.selected.name}}</ui-select-match>
+                              <ui-select-choices repeat="country.code as country in countries | filter: $select.search">
+                                <div ng-bind-html="country.name | highlight: $select.search"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                          </div>
+                          <div class="col-lg-7">
+                            <div class="form-group">
+                              <input type="text"
+                                  name="id"
+                                  ng-if="slocation.country"
+                                  ng-required
+                                  typeahead-on-select="actions.slocSelect(slocation, $item, $model)"
+                                  ng-model="slocation._tmp_location"
+                                  placeholder="Location"
+                                  typeahead="location as location.name for location in actions.getLocation($viewValue, slocation.country)"
+                                  typeahead-template-url="locationTemplate.html"
+                                  class="form-control"/>
+                            </div>
+                            <span ng-show="loadingLocations" ><i class="fa fa-spinner fa-spin"></i> Loading...</span>
+                            <div ng-if="slocation.id">
+                              <p>
+                                <b>[{{slocation.level}}]</b> {{slocation.code}} {{slocation.name}}
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                              <button ng-if="$index > 0" class="btn btn-danger btn-circle" type="button" ng-click="actions.deleteLocation(entry, $index)"><i class="fa fa-minus"></i>
+                              </button>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                      <a role="button" class="btn btn-success" ng-click="actions.addLocation(entry)">Add Another Location</a>
+                  </div>
+                  <div class="form-group">
+                    <label>Excerpt</label>
+                    <textarea ng-model="entry.excerpt" class="form-control" rows="5"></textarea>
+                  </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label>Sector(s)</label>
+                <ui-select multiple ng-model="entry.interest" class="form-control">
+                  <ui-select-match placeholder="Select Sector...">{{$item.subsector}} &lt;{{$item.sector}}&gt;</ui-select-match>
+                  <ui-select-choices repeat="value.id as value in definitions.interest.values | filter: $select.search">
+                    <div ng-bind-html="value.subsector | highlight: $select.search"></div>
+                    <small>
+                      <span ng-bind-html="value.sector | highlight: $select.search"></span>
+                    </small>
+                  </ui-select-choices>
+                </ui-select>
+            </div>
+            <div class="form-group">
+                <label>Information Type</label>
+                <ui-select multiple ng-model="entry.informationtype"  class="form-control">
+                  <ui-select-match placeholder="Select Type...">{{$item.name}}</ui-select-match>
+                  <ui-select-choices repeat="value.id as value in definitions.informationtype.values">
+                    <div ng-bind-html="value.name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
+            </div>
+           <div class="form-group">
+              <label>Response Category</label>
+              <ui-select multiple ng-model="entry.responsecategory" class="form-control">
+                  <ui-select-match placeholder="Select Category...">{{$item.name}}</ui-select-match>
+                  <ui-select-choices repeat="value.id as value in definitions.responsecategory.values">
+                    <div ng-bind-html="value.name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
+          </div>
+          <div class="form-group">
+              <label>Vulnerable groups</label>
+              <ui-select multiple ng-model="entry.vulnerablegroup"  class="form-control">
+                  <ui-select-match placeholder="Select...">{{$item.name}}</ui-select-match>
+                  <ui-select-choices repeat="value.id as value in definitions.vulnerablegroup.values">
+                    <div ng-bind-html="value.name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
+          </div>
+          <div class="form-group">
+              <label>Groups Affected</label>
+              <ui-select multiple ng-model="entry.affected"  class="form-control">
+                  <ui-select-match placeholder="Select...">{{$item.name}}</ui-select-match>
+                  <ui-select-choices repeat="value.id as value in definitions.affected.values">
+                    <div ng-bind-html="value.name | highlight: $select.search"></div>
+                  </ui-select-choices>
+                </ui-select>
+          </div>
+          <div class="form-group" ng-if="!entry.informationtype || entry.informationtype.indexOf(78) == -1">
+              <label>Severity</label>
+              <ui-select ng-model="entry.severity">
+                <ui-select-match placeholder="Select Severity">{{$select.selected.level}}: {{$select.selected.name}}</ui-select-match>
+                <ui-select-choices repeat="severity.level as severity in SEVERITY">
+                  <div>{{severity.level}}: {{severity.name}}</div>
+                </ui-select-choices>
+              </ui-select>
+          </div>
+          <div class="form-group">
+              <label>Reliability</label>
+              <ui-select ng-model="entry.reliability">
+                <ui-select-match placeholder="Select Reliability">{{$select.selected.level}}: {{$select.selected.name}}</ui-select-match>
+                <ui-select-choices repeat="reliability.level as reliability in RELIABILITY">
+                  <div>{{reliability.level}}: {{reliability.name}}</div>
+                </ui-select-choices>
+              </ui-select>
+          </div>
+        </div>
+
+  </div>
+  <div class="row pull-right panel-body">
+    <button type="submit" class="btn btn-primary" type="button"><i class="fa fa-check"></i> Save</button>
+    <button ng-click="actions.submitCarryExcerpt(formEntry, entry)" class="btn btn-success" type="button"><i class="fa fa-check"></i> Save & Add new tags</button>
+    <button ng-click="actions.cancel()" class="btn btn-warning" type="button"><i class="fa fa-times"> Cancel</i></button>
+  </div>
+</form>
+<!-- end form -->
+          </div>
+        </div>
+    </div>
+</div>

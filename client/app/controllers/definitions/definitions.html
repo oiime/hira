@@ -1,0 +1,41 @@
+<div class="panel panel-default">
+
+ <tabset type="pills panel-body">
+    <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th ng-repeat="column in tab.columns">{{column.title}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="odd gradeX" ng-repeat="value in tab.values">
+                            <td ng-if="!value._edit" ng-repeat="column in tab.columns">{{value[column.name]}}</td>
+                            <td ng-if="value._edit" ng-repeat="column in tab.columns" ng-switch on="column.type">
+                                <input class="form-control" type="text" ng-model="value[column.name]" placeholder="{{column.title}}" ng-switch-when="text"/>
+                                <textarea class="form-control" ng-model="value[column.name]" placeholder="{{column.title}}" ng-switch-when="textarea"></textarea>
+                            </td>
+
+                            <td ng-if="!value._edit && myself.role==2">
+                                <button class="btn btn-xs btn-outline btn-primary" type="button" ng-click="actions.editValue(value)"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-xs btn-outline btn-danger" type="button" ng-click="actions.deleteValue(tab, value, $index)"><i class="fa fa-minus"></i></button>
+                            </td>
+                             <td ng-if="value._edit && myself.role==2">
+                                <button class="btn btn-xs btn-outline btn-primary" type="button" ng-click="actions.saveValue(tab, value)"><i class="fa fa-save"></i></button>
+                                <button class="btn btn-xs btn-outline btn-warning" type="button" ng-click="actions.cancelValue(tab, value,  $index)"><i class="fa fa-minus"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="odd gradeX" ng-if="myself.role==2">
+                            <td colspan="100%">
+                                <button class="btn btn-xs btn-outline btn-primary" type="button" ng-click="actions.addValue(tab)"><i class="fa fa-plus"> Add Value</i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </tab>
+  </tabset>
+</div>

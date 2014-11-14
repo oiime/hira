@@ -1,0 +1,116 @@
+<script type="text/ng-template" id="parentTemplate.html">
+  <a>
+      <b>[{{match.model.level}}] {{match.model.code}}</b>
+      <span bind-html-unsafe="match.model.name | typeaheadHighlight:query"></span>
+  </a>
+</script>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="well panel-body">
+                <form role="form">
+                    <div class="row">
+                      <div class="col-lg-2">
+                          <div class="form-group">
+                            <label for="country">Country:</label>
+                            <ui-select ng-model="filters.country" style="min-width:10em;">
+                              <ui-select-match placeholder="Select Country">{{$select.selected.name}}</ui-select-match>
+                              <ui-select-choices repeat="country.code as country in countries | filter: $select.search">
+                                <div ng-bind-html="country.name | highlight: $select.search"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                          </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <br/>
+                            <button type="submit" class="btn btn-primary" ng-click="actions.filter(filters)">Filter</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-success pull-right" ng-click="actions.add()">Add Location</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" ng-table="tableParams">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left;">Country</th>
+                                <th style="text-align: left;">Parent</th>
+                                <th style="text-align: left;">Name</th>
+                                <th style="text-align: left;">Code</th>
+                                <th style="text-align: left;">Level</th>
+                                <th style="text-align: left;">Latitude</th>
+                                <th style="text-align: left;">Longitude</th>
+                                <th style="min-width:120px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="odd gradeX" ng-repeat="sloc in $data" >
+                                <td>
+                                    <span ng-if="!sloc._edit">{{sloc.country}}</span>
+                                    <ui-select ng-if="sloc._edit" ng-model="sloc.country" style="min-width:10em;">
+                                      <ui-select-match placeholder="Select Country">{{$select.selected.name}}</ui-select-match>
+                                      <ui-select-choices repeat="country.code as country in countries | filter: $select.search">
+                                        <div ng-bind-html="country.name | highlight: $select.search"></div>
+                                      </ui-select-choices>
+                                    </ui-select>
+                                </td>
+                                <td>
+                                    <span><b>{{sloc.parent.code}}</b> {{sloc.parent.name}}</span>
+                                    <div class="input-group" ng-if="sloc._edit">
+                                        <input type="text"
+                                          name="parent"
+                                          ng-required
+                                          typeahead-on-select="actions.slocSelect(sloc, $item, $model)"
+                                          ng-model="sloc.tmp_parent"
+                                          placeholder="Parent"
+                                          typeahead="parent as parent.name for parent in actions.getParent($viewValue, sloc.country)"
+                                          typeahead-template-url="parentTemplate.html"
+                                          class="form-control"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span ng-if="!sloc._edit">{{sloc.name}}</span>
+                                    <input ng-if="sloc._edit" placeholder="Name" type="text" class="form-control" ng-model="sloc.name"/>
+                                </td>
+                                <td>
+                                    <span ng-if="!sloc._edit">{{sloc.code}}</span>
+                                    <input ng-if="sloc._edit" placeholder="Code" type="text" class="form-control" ng-model="sloc.code"/>
+                                </td>
+                                <td>
+                                    <span>{{sloc.level}}</span>
+                                </td>
+                                <td>
+
+                                            <span ng-if="!sloc._edit && sloc.latitude">{{sloc.latitude}}</span>
+                                            <input placeholder="latitude" ng-if="sloc._edit" type="text" class="form-control" ng-model="sloc.latitude"/>
+                                </td>
+                                <td>
+                                            <span ng-if="!sloc._edit && sloc.longitude">{{sloc.longitude}}</span>
+                                            <input placeholder="longitude" ng-if="sloc._edit" type="text" class="form-control" ng-model="sloc.longitude"/>
+                                </td>
+                                <td ng-if="myself.role==2">
+                                  <button ng-if="!sloc._edit" class="btn btn-primary btn-circle" type="button" ng-click="actions.edit(sloc)"><i class="fa fa-pencil"></i>
+                                  </button>
+                                  <button ng-if="sloc._edit" class="btn btn-primary btn-circle" type="button" ng-click="actions.save(sloc)"><i class="fa fa-save"></i>
+                                  </button>
+                                  <button class="btn btn-danger btn-circle" type="button" ng-click="actions.delete(sloc, $index)"><i class="fa fa-minus"></i>
+                                  </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
