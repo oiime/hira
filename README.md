@@ -8,4 +8,63 @@ The Humanitarian Information Review and Analysis platform was developed to ease 
 
 The platform is administered by a group of three organizations, namely DHN, OCHA and ACAPS who are responsible for the appropriate and safe use, maintenance and development of the platform.
 
-Platform code contributed by Itamar Maltz 
+### Requirements ###
+- NodeJS >= 0.10.25
+- npm >= 1.4.20
+
+### Installation ###
+```
+npm install
+bower instll
+grunt --force
+```
+
+### Upstart script ###
+*Assuming the code is located in /var/www/hira*
+
+```
+# node-hira.conf
+
+description "start hira"
+
+start on started networking
+stop on runlevel [016]
+
+
+limit nofile 1000000 1000000
+
+
+console log
+
+script
+  
+  mkdir -p /var/www/hira
+  cd /var/www/hira
+  
+  export NODE_ENV="production"
+  /usr/bin/nodejs /var/www/hira/dist/server/app.js
+end script
+
+respawn
+```
+
+### nginx virtual host ###
+```
+server {
+    listen 80;
+
+    server_name hira.example.com;
+
+    location / {
+        proxy_pass http://localhost:9000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+
+Platform code contributed by Itamar Maltz, Licensed under GPLv2 
