@@ -7,7 +7,6 @@
 
 module.exports = {
   DOMAIN: 'http://localhost:9000',
-  SESSION_SECRET: "dnu-secret",
   // Control debug level for modules using visionmedia/debug
   DEBUG: ''
 };
